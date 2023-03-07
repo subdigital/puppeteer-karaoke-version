@@ -2,7 +2,26 @@ import {startBrowser} from "./browser.js";
 import {signIn} from "./signIn.js";
 import * as dotenv from 'dotenv';
 
-dotenv.config()
+dotenv.config();
+
+if (!process.env.KV_USERNAME || !process.env.KV_PASSWORD) {
+  console.error("Missing KV_USERNAME or KV_PASSWORD in environment")
+  process.exit(1);
+}
+
+let args = process.argv;
+if (args[0] =~ /node$/) {
+  args = args.slice(2);
+} else if (args[0] =~ /npm$/) {
+  args = args.slice(3);
+}
+const songUrl = args[0];
+if (!songUrl) {
+  console.error("Usage: npm run start <song url>")
+  process.exit(1);
+}
+
+console.log(`Starting for song page: ${songUrl}`);
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -18,7 +37,7 @@ await signIn(page,
   process.env.KV_PASSWORD
 )
 
-await page.goto("https://www.karaoke-version.com/custombackingtrack/eagles/hotel-california.html")
+await page.goto(songUrl);
 
 const soloButtonSelector = ".track__controls.track__solo"
 let soloButtons = await page.$$(soloButtonSelector);

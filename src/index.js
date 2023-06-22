@@ -39,7 +39,7 @@ await signIn(page,
 
 await page.goto(songUrl);
 
-await sleep(2000);
+await sleep(6000);
 
 const soloButtonSelector = ".track__controls.track__solo"
 let soloButtons = await page.$$(soloButtonSelector);

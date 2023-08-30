@@ -68,3 +68,5 @@ for (const soloButton of soloButtons) {
   i += 1;
 }
 
+console.log("Done!");
+await browser.close();

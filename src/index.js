@@ -16,6 +16,7 @@ if (args[0] =~ /node$/) {
 } else if (args[0] =~ /npm$/) {
   args = args.slice(3);
 }
+
 const songUrl = args[0];
 if (!songUrl) {
   console.error("Usage: npm run start <song url>\n\n\t-d <path> to change the download directory\n\t-h to use headless mode")
@@ -26,6 +27,9 @@ if (!songUrl) {
 
 let downloadPath = util.getArgValue(args, "-d");
 let headless = args.includes("-h") || args.includes("--headless");
+let pitch = parseInt(util.getArgValue(args, "-p"));
+
+// START BROWSER
 
 console.log("Configuring chromium driver...");
 const browser = await startBrowser({ headless: headless });
@@ -59,6 +63,29 @@ await util.sleep(6000);
 
 page.setDefaultTimeout(120000);
 
+if (!Number.isNaN(pitch)) {
+  // pitch is remembered per-song on your account, so this 
+  // logic can't be deterministic. Instead we'll try to infer which
+  // direction we need to go based on what the pitch is currently set to.
+  const pitchLabel = await page.waitForSelector("span.pitch__value");
+  const currentPitch = parseInt(await pitchLabel.evaluate(el => el.innerText));
+
+  console.log(`Setting pitch to ${pitch})`);
+  console.log(`Pitch is currently set to ${currentPitch}`)
+
+  const pitchUpButton = await page.waitForSelector("div.pitch button.btn--pitch[title='Key up']");
+  const pitchDownButton = await page.waitForSelector("div.pitch button.btn--pitch[title='Key down']");
+  let diff = pitch - currentPitch;
+  
+  let button = diff < 0 ? pitchDownButton : pitchUpButton;
+  for (let index = 0; index < Math.abs(diff); index++) {
+    console.debug("adjusting pitch");
+    button.click();
+  }
+  // need to reload after pitching
+  (await page.waitForSelector("a#pitch-link")).click();
+  await util.sleep(4000);
+}
 
 const soloButtonSelector = ".track__controls.track__solo"
 let soloButtons = await page.$$(soloButtonSelector);

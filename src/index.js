@@ -82,9 +82,11 @@ if (!Number.isNaN(pitch)) {
     console.debug("adjusting pitch");
     button.click();
   }
-  // need to reload after pitching
-  (await page.waitForSelector("a#pitch-link")).click();
-  await util.sleep(4000);
+  if (diff != 0) {
+    // need to reload after pitching
+    (await page.waitForSelector("a#pitch-link")).click();
+    await util.sleep(4000);
+  }
 }
 
 const soloButtonSelector = ".track__controls.track__solo"

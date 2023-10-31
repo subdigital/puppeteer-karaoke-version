@@ -5,7 +5,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 if (!process.env.KV_USERNAME || !process.env.KV_PASSWORD) {
-  console.error("Missing KV_USERNAME or KV_PASSWORD in environment")
+  console.error("Missing KV_USERNAME or KV_PASSWORD in environment. Did you create a .env file in this directory and include these?");
   process.exit(1);
 }
 
@@ -29,6 +29,7 @@ function sleep(ms) {
 
 const browser = await startBrowser();
 const page = await browser.newPage();
+console.log("Signing in...");
 await page.setViewport({width: 1080, height: 1024});
 
 await page.goto("https://www.karaoke-version.com")
@@ -37,6 +38,7 @@ await signIn(page,
   process.env.KV_PASSWORD
 )
 
+console.log(`Starting for song page: ${songUrl}`);
 await page.goto(songUrl);
 
 await sleep(6000);
@@ -45,11 +47,15 @@ const soloButtonSelector = ".track__controls.track__solo"
 let soloButtons = await page.$$(soloButtonSelector);
 
 page.setDefaultTimeout(120000);
+let trackNames = await page.$$(".mixer .track .track__caption");
 
 let i = 1;
 let downloadButton = await page.waitForSelector("a.download");
 for (const soloButton of soloButtons) {
   console.log(`soloing track ${i}`)
+  // the click track also has the intro element, so we need to extract just the text
+  const trackName = await trackNames[i].evaluate(el => el.lastChild.nodeValue.trim());
+  console.log(`soloing track ${i} of ${soloButtons.length} (${trackName})`);
   await soloButton.click();
   await sleep(3000);
   await downloadButton.click();

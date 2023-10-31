@@ -39,10 +39,11 @@ if (downloadPath) {
 
 // SIGN IN 
 console.log("Signing in...");
+const domain = new URL(songUrl).hostname;
 await page.setViewport({width: 1080, height: 1024});
 
-await page.goto("https://www.karaoke-version.com")
 await signIn(page, 
+  domain,
   process.env.KV_USERNAME,
   process.env.KV_PASSWORD
 )

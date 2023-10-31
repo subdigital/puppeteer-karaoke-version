@@ -97,7 +97,7 @@ let i = 1;
 let downloadButton = await page.waitForSelector("a.download");
 for (const soloButton of soloButtons) {
   // the click track also has the intro element, so we need to extract just the text
-  const trackName = await trackNames[i].evaluate(el => el.lastChild.nodeValue.trim());
+  const trackName = await trackNames[i-1].evaluate(el => el.lastChild.nodeValue.trim());
   console.log(`soloing track ${i} of ${soloButtons.length} (${trackName})`);
   await soloButton.click();
   await util.sleep(3000);

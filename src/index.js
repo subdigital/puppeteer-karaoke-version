@@ -18,15 +18,17 @@ if (args[0] =~ /node$/) {
 }
 const songUrl = args[0];
 if (!songUrl) {
-  console.error("Usage: npm run start <song url>")
+  console.error("Usage: npm run start <song url>\n\n\t-d <path> to change the download directory\n\t-h to use headless mode")
   process.exit(1);
 }
 
 // PARSE OPTIONS
 
 let downloadPath = util.getArgValue(args, "-d");
+let headless = args.includes("-h") || args.includes("--headless");
 
-const browser = await startBrowser();
+console.log("Configuring chromium driver...");
+const browser = await startBrowser({ headless: headless });
 const page = await browser.newPage();
 if (downloadPath) {
   console.log("Using download path ", downloadPath);

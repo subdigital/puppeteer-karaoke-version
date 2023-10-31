@@ -1,6 +1,14 @@
 import puppeteer from "puppeteer";
 
-async function startBrowser() {
+async function setDownloadPath(page, path) {
+  const client = await page.target().createCDPSession();
+  await client.send('Page.setDownloadBehavior', {
+    behavior: 'allow',
+    downloadPath: downloadPath
+  });
+}
+
+async function startBrowser(options) {
   let browser;
   try {
     console.log("Opening the browser...");
@@ -17,5 +25,6 @@ async function startBrowser() {
 }
 
 export {
-  startBrowser
+  startBrowser,
+  setDownloadPath
 };

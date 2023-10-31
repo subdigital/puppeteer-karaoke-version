@@ -1,5 +1,6 @@
 import {startBrowser} from "./browser.js";
 import {signIn} from "./signIn.js";
+import util from "./util.js";
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -21,14 +22,22 @@ if (!songUrl) {
   process.exit(1);
 }
 
-console.log(`Starting for song page: ${songUrl}`);
+// PARSE OPTIONS
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+let downloadPath = util.getArgValue(args, "-d");
 
 const browser = await startBrowser();
 const page = await browser.newPage();
+if (downloadPath) {
+  console.log("Using download path ", downloadPath);
+  const client = await page.target().createCDPSession();
+  await client.send('Page.setDownloadBehavior', {
+    behavior: 'allow',
+    downloadPath: downloadPath
+  });
+}
+
+// SIGN IN 
 console.log("Signing in...");
 await page.setViewport({width: 1080, height: 1024});
 
@@ -38,38 +47,40 @@ await signIn(page,
   process.env.KV_PASSWORD
 )
 
+// LOAD SONG
+
 console.log(`Starting for song page: ${songUrl}`);
 await page.goto(songUrl);
 
-await sleep(6000);
+await util.sleep(6000);
+
+page.setDefaultTimeout(120000);
+
 
 const soloButtonSelector = ".track__controls.track__solo"
 let soloButtons = await page.$$(soloButtonSelector);
-
-page.setDefaultTimeout(120000);
 let trackNames = await page.$$(".mixer .track .track__caption");
 
 let i = 1;
 let downloadButton = await page.waitForSelector("a.download");
 for (const soloButton of soloButtons) {
-  console.log(`soloing track ${i}`)
   // the click track also has the intro element, so we need to extract just the text
   const trackName = await trackNames[i].evaluate(el => el.lastChild.nodeValue.trim());
   console.log(`soloing track ${i} of ${soloButtons.length} (${trackName})`);
   await soloButton.click();
-  await sleep(3000);
+  await util.sleep(3000);
   await downloadButton.click();
   console.log("Waiting for download...")
-  await sleep(3000);
+  await util.sleep(3000);
   await page.waitForSelector("text/Your download will begin in a moment");
-  await sleep(3000);
+  await util.sleep(3000);
 
   const closeModalButton = await page.waitForSelector("button.js-modal-close");
   console.log("closing modal...");
-  await sleep(3000);
+  await util.sleep(3000);
   await closeModalButton.click();
 
-  await sleep(10000);
+  await util.sleep(10000);
 
   i += 1;
 }

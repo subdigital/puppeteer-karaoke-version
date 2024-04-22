@@ -35,6 +35,7 @@ Then run `npm run start <song url>`.
 - `-d <path>` - Change the download location
 -  `-h` or `--headless` - Use headless mode, which hides the UI.
 -  `-p <pitch offset>` - Change the pitch of the downloaded tracks (-1 to go down half step, 1 to go up half step, etc)
+- `-i` or `--intro` - Include the intro precount
 
 Using headless mode may make it less clear what is going on behind the scenes, so I suggest testing it out
 in the regular mode first.

@@ -17,8 +17,6 @@ if (args[0].match(/node$/)) {
   args = args.slice(3);
 }
 
-console.log(args);
-
 const songUrl = args[0];
 if (!songUrl) {
   console.error("Usage: npm run start <song url>\n\n\t-d <path> to change the download directory\n\t-h to use headless mode")

@@ -1,10 +1,10 @@
 import puppeteer from "puppeteer";
 
 async function setDownloadPath(page, path) {
-  const client = await page.target().createCDPSession();
+  const client = await page.createCDPSession();
   await client.send("Page.setDownloadBehavior", {
     behavior: "allow",
-    downloadPath: downloadPath,
+    downloadPath: path,
   });
 }
 

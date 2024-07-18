@@ -1,4 +1,4 @@
-import { startBrowser } from "./browser.js";
+import { startBrowser, setDownloadPath } from "./browser.js";
 import { signIn } from "./signIn.js";
 import util from "./util.js";
 import * as dotenv from "dotenv";
@@ -40,11 +40,7 @@ await page.setViewport({ width: 1080, height: 1024 });
 
 if (downloadPath) {
   console.log("Using download path ", downloadPath);
-  const client = await page.target().createCDPSession();
-  await client.send("Page.setDownloadBehavior", {
-    behavior: "allow",
-    downloadPath: downloadPath,
-  });
+  await setDownloadPath(page, downloadPath);
 }
 
 // SIGN IN

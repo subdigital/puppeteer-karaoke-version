@@ -2,6 +2,7 @@ import { startBrowser } from "./browser.js";
 import { signIn } from "./signIn.js";
 import util from "./util.js";
 import * as dotenv from "dotenv";
+import path from "path";
 
 dotenv.config();
 
@@ -28,9 +29,34 @@ if (!songUrl) {
 }
 
 // PARSE OPTIONS
-let downloadPath = util.getArgValue(args, "-d");
+let subf = args.includes("-s") || args.includes("--subfolder");
 let headless = args.includes("-h") || args.includes("--headless");
 let pitch = parseInt(util.getArgValue(args, "-p"));
+
+// Get base download path
+let downloadPath = util.getArgValue(args, "-d");
+if (!downloadPath) {
+  // Default download path to current directory + downloads
+  downloadPath = path.join(process.cwd(), "downloads");
+}
+
+// CALCULATE DOWNLOAD PATH
+if (subf) {
+  let artistName, trackName;
+  try {
+    ({ artistName, trackName } = util.extractArtistAndTrack(songUrl));
+  } catch (error) {
+    console.error(error.message);
+    process.exit(1);
+  }
+  // calculate full download path
+  const fullDownloadPath = path.join(
+    downloadPath,
+    `${artistName}-${trackName}`
+  );
+} else {
+  const fullDownloadPath = downloadPath;
+}
 
 // START BROWSER
 console.log("Configuring chromium driver...");
@@ -43,7 +69,7 @@ if (downloadPath) {
   const client = await page.target().createCDPSession();
   await client.send("Page.setDownloadBehavior", {
     behavior: "allow",
-    downloadPath: downloadPath,
+    downloadPath: fullDownloadPath,
   });
 }
 

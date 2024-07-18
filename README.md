@@ -37,6 +37,7 @@ Then run `npm run start <song url>`.
 
 - `-d <path>` Change the download location
 - `-h` or `--headless` Use headless mode, which hides the UI.
+- `-s` or `--subfolder` create a subfolder in download.
 - `-p <pitch offset>` Change the pitch of the downloaded tracks:
   - `-1` to go down half step
   - `1` to go up half step, etc
@@ -61,6 +62,10 @@ I would hate for anyone's account to get banned for abusing automation like this
 And Karaoke Version, if you're listening: We'd love if this was fully supported in the UI!
 
 ## Changelog
+
+## master/unreleased
+
+- Added `-s` option to add a subfolder
 
 ## 0.2
 

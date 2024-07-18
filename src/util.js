@@ -11,4 +11,21 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export default { getArgValue, sleep };
+function extractArtistAndTrack(url) {
+  const urlPattern =
+    /https?:\/\/[^\/]+\/custombackingtrack\/([a-z0-9-]+)\/([a-z0-9-]+)\.html/;
+  const match = url.match(urlPattern);
+  if (!match) {
+    throw new Error("Invalid song URL format");
+  }
+
+  let [_, artistName, trackName] = match;
+
+  // Sanitize names
+  artistName = artistName.replace(/-/g, "_");
+  trackName = trackName.replace(/-/g, "_");
+
+  return { artistName, trackName };
+}
+
+export default { getArgValue, sleep, extractArtistAndTrack };

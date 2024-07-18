@@ -2,9 +2,9 @@ import puppeteer from "puppeteer";
 
 async function setDownloadPath(page, path) {
   const client = await page.target().createCDPSession();
-  await client.send('Page.setDownloadBehavior', {
-    behavior: 'allow',
-    downloadPath: downloadPath
+  await client.send("Page.setDownloadBehavior", {
+    behavior: "allow",
+    downloadPath: downloadPath,
   });
 }
 
@@ -15,7 +15,7 @@ async function startBrowser(options) {
     browser = await puppeteer.launch({
       headless: options.headless,
       args: ["--disable-setuid-sandbox"],
-      'ignoreHTTPSErrors': true
+      ignoreHTTPSErrors: true,
     });
   } catch (err) {
     console.error("Could not create a browser instance: ", err);
@@ -23,7 +23,4 @@ async function startBrowser(options) {
   return browser;
 }
 
-export {
-  startBrowser,
-  setDownloadPath
-};
+export { startBrowser, setDownloadPath };

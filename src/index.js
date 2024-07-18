@@ -31,6 +31,7 @@ if (!songUrl) {
 let downloadPath = util.getArgValue(args, "-d");
 let headless = args.includes("-h") || args.includes("--headless");
 let pitch = parseInt(util.getArgValue(args, "-p"));
+let intro = args.includes("-i") || args.includes("--intro");
 
 // START BROWSER
 console.log("Configuring chromium driver...");
@@ -86,6 +87,15 @@ if (!Number.isNaN(pitch)) {
   }
 }
 
+// Handling the 'precount' checkbox if intro is enabled
+if (intro) {
+  const precountCheckbox = await page.waitForSelector("input#precount");
+  const isChecked = await precountCheckbox.evaluate((el) => el.checked);
+  if (!isChecked) {
+    await precountCheckbox.evaluate((el) => el.click());
+  }
+}
+
 const soloButtonSelector = ".track__controls.track__solo";
 let soloButtons = await page.$$(soloButtonSelector);
 let trackNames = await page.$$(".mixer .track .track__caption");
@@ -100,6 +110,7 @@ for (const soloButton of soloButtons) {
   console.log(`soloing track ${i} of ${soloButtons.length} (${trackName})`);
   await soloButton.click();
   await util.sleep(3000);
+
   await downloadButton.click();
   console.log("Waiting for download...");
   await util.sleep(3000);

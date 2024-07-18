@@ -1,5 +1,5 @@
-import {startBrowser} from "./browser.js";
-import {signIn} from "./signIn.js";
+import { startBrowser } from "./browser.js";
+import { signIn } from "./signIn.js";
 import util from "./util.js";
 import * as dotenv from 'dotenv';
 
@@ -11,9 +11,9 @@ if (!process.env.KV_USERNAME || !process.env.KV_PASSWORD) {
 }
 
 let args = process.argv;
-if (args[0] =~ /node$/) {
+if (args[0].match(/node$/)) {
   args = args.slice(2);
-} else if (args[0] =~ /npm$/) {
+} else if (args[0].match(/npm$/)) {
   args = args.slice(3);
 }
 
@@ -28,6 +28,8 @@ if (!songUrl) {
 let downloadPath = util.getArgValue(args, "-d");
 let headless = args.includes("-h") || args.includes("--headless");
 let pitch = parseInt(util.getArgValue(args, "-p"));
+let intro = args.includes("-i") || args.includes("--intro");
+
 
 // START BROWSER
 
@@ -46,9 +48,9 @@ if (downloadPath) {
 // SIGN IN 
 console.log("Signing in...");
 const domain = new URL(songUrl).hostname;
-await page.setViewport({width: 1080, height: 1024});
+await page.setViewport({ width: 1080, height: 1024 });
 
-await signIn(page, 
+await signIn(page,
   domain,
   process.env.KV_USERNAME,
   process.env.KV_PASSWORD
@@ -76,7 +78,7 @@ if (!Number.isNaN(pitch)) {
   const pitchUpButton = await page.waitForSelector("div.pitch button.btn--pitch[title='Key up']");
   const pitchDownButton = await page.waitForSelector("div.pitch button.btn--pitch[title='Key down']");
   let diff = pitch - currentPitch;
-  
+
   let button = diff < 0 ? pitchDownButton : pitchUpButton;
   for (let index = 0; index < Math.abs(diff); index++) {
     console.debug("adjusting pitch");
@@ -86,6 +88,16 @@ if (!Number.isNaN(pitch)) {
     // need to reload after pitching
     (await page.waitForSelector("a#pitch-link")).click();
     await util.sleep(4000);
+  }
+
+}
+
+// Handling the 'precount' checkbox if intro is enabled
+if (intro) {
+  const precountCheckbox = await page.waitForSelector("input#precount");
+  const isChecked = await precountCheckbox.evaluate(el => el.checked);
+  if (!isChecked) {
+    await precountCheckbox.evaluate(el => el.click());
   }
 }
 
@@ -97,7 +109,7 @@ let i = 1;
 let downloadButton = await page.waitForSelector("a.download");
 for (const soloButton of soloButtons) {
   // the click track also has the intro element, so we need to extract just the text
-  const trackName = await trackNames[i-1].evaluate(el => el.lastChild.nodeValue.trim());
+  const trackName = await trackNames[i - 1].evaluate(el => el.lastChild.nodeValue.trim());
   console.log(`soloing track ${i} of ${soloButtons.length} (${trackName})`);
   await soloButton.click();
   await util.sleep(3000);

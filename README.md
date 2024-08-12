@@ -1,3 +1,8 @@
+> [!WARNING]
+> This project has been moved to https://github.com/subdigital/kv-downloader
+
+---
+
 This is a utility script that automates a workflow for downloading individual tracks from Karaoke Version.
 
 This workflow is specific to how I use this service. If you want to change it you'll have to make your
